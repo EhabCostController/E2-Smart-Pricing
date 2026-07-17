@@ -7,7 +7,7 @@
     
     <!-- مكتبات الدعم والخطوط -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -46,6 +46,41 @@
             flex-direction: column;
             padding: 10px;
             overflow: hidden;
+        }
+
+        /* شاشة تسجيل الدخول الاحترافية */
+        #loginOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+        .login-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 35px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        .login-card h2 {
+            color: var(--accent);
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .login-card p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 25px;
         }
 
         #toastContainer {
@@ -355,6 +390,23 @@
 </head>
 <body>
 
+    <!-- شاشة تسجيل الدخول الاحترافية -->
+    <div id="loginOverlay">
+        <div class="login-card">
+            <h2>🔑 تسجيل الدخول للنظام</h2>
+            <p>يرجى إدخال كلمة المرور للوصول إلى نظام E2 السحابي</p>
+            
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group" style="margin-bottom: 20px; text-align: right;">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="loginPassword" class="input-control" placeholder="أدخل كلمة المرور..." required style="padding: 12px; text-align: center; letter-spacing: 4px;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">دخول النظام</button>
+            </form>
+            <div id="loginError" style="color: var(--danger); font-size: 12px; margin-top: 10px; font-weight: bold; display: none;">❌ كلمة المرور غير صحيحة!</div>
+        </div>
+    </div>
+
     <div id="toastContainer"></div>
 
     <header>
@@ -374,6 +426,19 @@
 
     <!-- ================= صفحة التسعير ================= -->
     <div id="pricing-tab" class="tab-content active">
+        
+        <!-- أزرار استيراد وتصدير الفاتورة (Excel) الحالية -->
+        <div class="card" style="padding: 12px; display: flex; flex-direction: row; gap: 10px;">
+            <button class="btn btn-primary" onclick="document.getElementById('invoiceExcelFileInput').click()" style="flex: 1;">
+                📥 استيراد فاتورة من Excel
+            </button>
+            <input type="file" id="invoiceExcelFileInput" accept=".xlsx, .xls" style="display: none;" onchange="importInvoiceFromExcel(event)">
+            
+            <button class="btn" onclick="exportInvoiceToExcel()" style="flex: 1; border-color: var(--accent); color: var(--accent);">
+                📤 تصدير الفاتورة لـ Excel
+            </button>
+        </div>
+
         <div class="summary-bar">
             <div class="summary-card">
                 <span class="lbl">أصناف القائمة</span>
@@ -490,6 +555,28 @@
     </div>
 
     <script>
+        // نظام حماية صفحة الدخول (كلمة المرور الافتراضية: 3102025)[cite: 3]
+        const SYSTEM_PASSWORD = "3102025";
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const enteredPassword = document.getElementById("loginPassword").value;
+            const errorDiv = document.getElementById("loginError");
+
+            if (enteredPassword === SYSTEM_PASSWORD) {
+                document.getElementById("loginOverlay").style.transition = "opacity 0.4s ease";
+                document.getElementById("loginOverlay").style.opacity = 0;
+                setTimeout(() => {
+                    document.getElementById("loginOverlay").style.display = "none";
+                }, 400);
+                showToast("🔓 تم تسجيل الدخول بنجاح!");
+            } else {
+                errorDiv.style.display = "block";
+                document.getElementById("loginPassword").value = "";
+                document.getElementById("loginPassword").focus();
+            }
+        }
+
         const dbName = "E2PriceSystemDB_V_Firebase";
         const dbVersion = 1;
         let localDb;
@@ -658,9 +745,9 @@
         }
 
         function closeSearch() {
-            const resultsContainer = document.getElementById("searchResults");
-            resultsContainer.classList.remove("active");
-            resultsContainer.innerHTML = "";
+            const font = document.getElementById("searchResults");
+            font.classList.remove("active");
+            font.innerHTML = "";
             activeGridRowIndex = -1;
             document.getElementById("searchInput").value = "";
         }
@@ -917,7 +1004,76 @@
             });
         }
 
-        // ================= الاستيراد والتصدير مع الإكسل والـ JSON =================
+        // ================= استيراد وتصدير الفواتير من صفحة التسعير (Excel) =================
+
+        async function importInvoiceFromExcel(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (jsonData.length === 0) {
+                        showToast("ملف الفاتورة المستورد فارغ", "error");
+                        return;
+                    }
+
+                    // إفراغ الفاتورة الحالية وملئها بالجديد
+                    activeInvoiceItems = [];
+                    jsonData.forEach(row => {
+                        const name = row['اسم الصنف'] || row['الاسم'] || row['name'];
+                        if (name) {
+                            activeInvoiceItems.push({
+                                name: name.toString().trim(),
+                                unit: row['الوحدة'] || row['unit'] || 'قطعة',
+                                price: parseFloat(row['السعر'] || row['السعر الأساسي'] || row['price']) || 0,
+                                quantity: parseFloat(row['الكمية'] || row['الكمية المطلوب تسعيرها'] || row['quantity']) || 1
+                            });
+                        }
+                    });
+
+                    renderInvoiceTable();
+                    showToast(`📊 تم استيراد عدد ${activeInvoiceItems.length} صنف بنجاح للفاتورة!`);
+                    document.getElementById('invoiceExcelFileInput').value = "";
+                } catch (error) {
+                    console.error("Invoice Import Error:", error);
+                    showToast("حدث خطأ أثناء قراءة ملف الفاتورة", "error");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function exportInvoiceToExcel() {
+            if (activeInvoiceItems.length === 0) {
+                showToast("الفاتورة الحالية فارغة للتصدير!", "error");
+                return;
+            }
+            
+            // تجهيز البيانات المصدرة
+            const exportData = activeInvoiceItems.map(item => ({
+                'اسم الصنف': item.name,
+                'الوحدة': item.unit,
+                'السعر': item.price,
+                'الكمية المطلوب تسعيرها': item.quantity,
+                'إجمالي الصنف': (item.price * item.quantity)
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "تسعير الفاتورة");
+            
+            const fileName = `فاتورة_E2_مسعرة_${new Date().toISOString().slice(0,10)}.xlsx`;
+            XLSX.writeFile(workbook, fileName);
+            showToast("📥 تم تصدير الفاتورة كملف Excel بنجاح!");
+        }
+
+
+        // ================= استيراد وتصدير قاعدة البيانات الكلية =================
 
         async function importFromExcel(event) {
             const file = event.target.files[0];
@@ -952,7 +1108,6 @@
                                     const docRef = firebaseDb.collection("products").doc(name.toString().trim());
                                     batch.set(docRef, {
                                         name: name.toString().trim(),
-                                        // تدعم كلمة التنصيف والتصنيف
                                         category: row['التصنيف'] || row['التنصيف'] || row['category'] || 'عام',
                                         unit: row['الوحدة'] || row['unit'] || 'قطعة',
                                         price: parseFloat(row['السعر'] || row['price']) || 0
@@ -972,7 +1127,6 @@
                             if (name) {
                                 objectStore.put({
                                     name: name.toString().trim(),
-                                    // تدعم كلمة التنصيف والتصنيف
                                     category: row['التصنيف'] || row['التنصيف'] || row['category'] || 'عام',
                                     unit: row['الوحدة'] || row['unit'] || 'قطعة',
                                     price: parseFloat(row['السعر'] || row['price']) || 0
