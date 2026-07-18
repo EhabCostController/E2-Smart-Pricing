@@ -34,7 +34,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
         body { background-color: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; padding: 10px; overflow: hidden; }
 
-        /* شاشة تسجيل الدخول المحدثة */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: var(--bg-main); display: flex; justify-content: center; align-items: center; z-index: 10000; }
         .login-card { background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 35px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); text-align: center; }
         .login-card h2 { color: var(--accent); font-size: 22px; font-weight: 700; margin-bottom: 8px; }
@@ -91,7 +90,6 @@
         .sync-online { background-color: rgba(34, 197, 94, 0.15); color: var(--success); border: 1px solid var(--success); }
         .sync-offline { background-color: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
 
-        /* التحكم في عرض الصفحات حسب الصلاحية */
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: inline-flex !important; }
         body.is-admin div.admin-only { display: flex !important; }
@@ -111,7 +109,7 @@
 </head>
 <body>
 
-    <!-- شاشة تسجيل الدخول المحدثة -->
+    <!-- شاشة تسجيل الدخول السحابية الذكية -->
     <div id="loginOverlay">
         <div class="login-card">
             <h2>🔑 تسجيل الدخول للسيستم</h2>
@@ -119,8 +117,8 @@
             
             <form onsubmit="handleMultiUserLogin(event)">
                 <div class="form-group" style="margin-bottom: 12px; text-align: right;">
-                    <label>اسم المستخدم</label>
-                    <input type="text" id="loginUsername" class="input-control" placeholder="اسم المستخدم (مثال: Ehab)" required style="text-align: center;">
+                    <label>اسم المستخدم (بالإنجليزي)</label>
+                    <input type="text" id="loginUsername" class="input-control" placeholder="مثال: Ehab" required style="text-align: center;">
                 </div>
                 <div class="form-group" style="margin-bottom: 20px; text-align: right;">
                     <label>كلمة المرور</label>
@@ -138,7 +136,7 @@
         <div class="logo-section">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <h1>نظام E2 الذكي</h1>
-                <span id="cloudStatus" class="sync-badge sync-offline">🔌 غير متصل بالسحابة</span>
+                <span id="cloudStatus" class="sync-badge sync-offline">🔌 جاري الاتصال...</span>
                 <span id="userBadge" style="background:#334155; padding: 2px 10px; border-radius:4px; font-size:11px; font-weight:bold; color:var(--accent)">-</span>
             </div>
             <span>إدارة تكاليف، أرشفة سحابية، ومراقبة تغير الأسعار</span>
@@ -148,6 +146,7 @@
             <button class="tab-btn" onclick="switchTab('archive-tab', this)">🗄️ أرشيف الفواتير</button>
             <button class="tab-btn admin-only" onclick="switchTab('items-tab', this)">📦 إدارة الأصناف</button>
             <button class="tab-btn admin-only" onclick="switchTab('history-tab', this)">📈 تقرير تغير الأسعار</button>
+            <button class="tab-btn admin-only" onclick="switchTab('users-tab', this)">👥 إدارة المستخدمين</button>
             <button class="tab-btn admin-only" onclick="switchTab('settings-tab', this)">⚙️ الإعدادات</button>
         </div>
     </header>
@@ -194,13 +193,13 @@
         </div>
     </div>
 
-    <!-- ================= صفحة أرشيف الفواتير السحابي المحدثة ================= -->
+    <!-- ================= صفحة أرشيف الفواتير ================= -->
     <div id="archive-tab" class="tab-content">
         <div class="archive-layout">
             <div class="card" style="overflow-y: auto;">
                 <div class="card-title">🗄️ قائمة الفواتير المؤرشفة</div>
                 <div id="archiveList" style="display:flex; flex-direction:column; gap:8px;">
-                    <div style="text-align:center; color:var(--text-muted); padding:20px;">جاري تحميل الأرشيف من السحابة...</div>
+                    <div style="text-align:center; color:var(--text-muted); padding:20px;">جاري تحميل الأرشيف...</div>
                 </div>
             </div>
             <div class="card" style="overflow:hidden; display:flex; flex-direction:column;">
@@ -239,7 +238,7 @@
         </div>
     </div>
 
-    <!-- ================= صفحة إدارة الأصناف (Admin Only) ================= -->
+    <!-- ================= صفحة إدارة الأصناف ================= -->
     <div id="items-tab" class="tab-content">
         <div class="db-layout">
             <div class="card" style="height: fit-content;">
@@ -280,7 +279,7 @@
         </div>
     </div>
 
-    <!-- ================= صفحة تقرير تغير الأسعار (Admin Only) ================= -->
+    <!-- ================= صفحة تقرير تغير الأسعار ================= -->
     <div id="history-tab" class="tab-content">
         <div class="card" style="flex:1; overflow:hidden;">
             <div class="card-title">📈 سجل مراقبة وتغير أسعار الأصناف في السوق</div>
@@ -303,7 +302,61 @@
         </div>
     </div>
 
-    <!-- ================= صفحة الإعدادات (Admin Only) ================= -->
+    <!-- ================= 👥 صفحة إدارة المستخدمين (Admin Only) ================= -->
+    <div id="users-tab" class="tab-content">
+        <div class="db-layout">
+            <div class="card" style="height: fit-content;">
+                <div class="card-title" id="userFormActionTitle">إضافة / تعديل مستخدم سحابي</div>
+                <form id="userForm" onsubmit="saveUserToDb(event)">
+                    <input type="hidden" id="user_is_edit" value="false">
+                    <div class="form-group" style="margin-bottom:8px">
+                        <label>اسم المستخدم البرمجي (بالإنجليزي - لا يتغير)</label>
+                        <input type="text" id="user_username" class="input-control" required placeholder="مثال: Ehab" autocomplete="off">
+                    </div>
+                    <div class="form-group" style="margin-bottom:8px">
+                        <label>الاسم الظاهر بالفاتورة (بالعربي)</label>
+                        <input type="text" id="user_displayName" class="input-control" required placeholder="مثال: إيهاب غبريال" autocomplete="off">
+                    </div>
+                    <div class="form-group" style="margin-bottom:8px">
+                        <label>كلمة المرور (الباسورد)</label>
+                        <input type="text" id="user_password" class="input-control" required placeholder="اكتب الباسورد هنا" autocomplete="off">
+                    </div>
+                    <div class="form-group" style="margin-bottom:12px">
+                        <label>الصلاحية</label>
+                        <select id="user_role" class="input-control">
+                            <option value="staff">مستخدم عادي (Staff - قراءة وأرشفة فقط)</option>
+                            <option value="admin">مدير عام (Admin - تحكم كامل وحذف)</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button type="submit" class="btn btn-primary" style="flex:1">حفظ المستخدم بالسحابة</button>
+                        <button type="button" id="btnCancelUserEdit" class="btn" style="display:none;" onclick="resetUserForm()">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px; overflow:hidden;">
+                <span style="font-weight:700; color:var(--accent)">👥 الحسابات المسجلة للسيستم على السحابة حالياً:</span>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>اسم المستخدم</th>
+                                <th>الاسم العربي</th>
+                                <th>الباسورد الحالي</th>
+                                <th>الصلاحية</th>
+                                <th style="width: 150px;">التحكم من السيستم</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr><td colspan="5" style="text-align:center; color:var(--text-muted)">جاري تحميل الحسابات...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= صفحة الإعدادات ================= -->
     <div id="settings-tab" class="tab-content">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
             <div class="card">
@@ -316,40 +369,12 @@
     </div>
 
     <script>
-        let currentUser = { username: '', role: 'staff' };
-        
-        function handleMultiUserLogin(event) {
-            event.preventDefault();
-            const userInp = document.getElementById("loginUsername").value.trim();
-            const passInp = document.getElementById("loginPassword").value;
-            const errorDiv = document.getElementById("loginError");
-
-            if (userInp === 'ehab' && passInp === '3102025') {
-                currentUser = { username: 'إيهاب', role: 'admin' };
-                document.body.classList.add('is-admin');
-                successfulLogin();
-            } else if (userInp === 'keroles' && passInp === '123456') {
-                currentUser = { username: 'كيرلس', role: 'staff' };
-                document.body.classList.remove('is-admin');
-                successfulLogin();
-            } else {
-                errorDiv.style.display = "block";
-            }
-        }
-
-        function successfulLogin() {
-            document.getElementById("userBadge").innerText = `👤 ${currentUser.username} (${currentUser.role === 'admin' ? 'مدير عام' : 'مستخدم عادي'})`;
-            document.getElementById("loginOverlay").style.opacity = 0;
-            setTimeout(() => { document.getElementById("loginOverlay").style.display = "none"; }, 400);
-            showToast(`مرحباً بك: ${currentUser.username}`);
-            tryConnectFirebaseOnLoad();
-        }
-
+        let currentUser = { username: '', displayName: '', role: 'staff' };
         let allItemsCached = [];
-        let activeGridRowIndex = -1;
         let activeInvoiceItems = [];
         let firebaseDb = null;
-        let currentSelectedArchivedInvoice = null; // للاحتفاظ بالفاتورة المحددة في الأرشيف
+        let currentSelectedArchivedInvoice = null;
+        let systemUsersCached = []; 
 
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -358,7 +383,12 @@
             btnElement.classList.add('active');
             if (tabId === 'archive-tab') loadInvoicesArchive();
             if (tabId === 'history-tab') loadPriceHistory();
+            if (tabId === 'users-tab') loadSystemUsers();
         }
+
+        window.onload = function() {
+            tryConnectFirebaseOnLoad();
+        };
 
         function tryConnectFirebaseOnLoad() {
             const firebaseConfig = {
@@ -374,123 +404,74 @@
                 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
                 firebaseDb = firebase.firestore();
                 
+                document.getElementById("cloudStatus").className = "sync-badge sync-online";
+                document.getElementById("cloudStatus").innerText = "☁️ السحابة متصلة";
+                
+                seedInitialUsersData();
+
                 firebaseDb.collection("products").onSnapshot((snapshot) => {
                     const cloudItems = [];
                     snapshot.forEach(doc => cloudItems.push(doc.data()));
-                    if (cloudItems.length > 0 || snapshot.empty) {
-                        allItemsCached = cloudItems;
-                        document.getElementById("dbCount").innerText = allItemsCached.length;
-                        renderDatabaseTable();
-                    }
+                    allItemsCached = cloudItems;
+                    document.getElementById("dbCount").innerText = allItemsCached.length;
+                    renderDatabaseTable();
                 });
 
-                document.getElementById("cloudStatus").className = "sync-badge sync-online";
-                document.getElementById("cloudStatus").innerText = "☁️ السحابة متصلة";
             } catch (err) {
-                showToast("فشل الاتصال بـ Firebase السحابي", "error");
+                document.getElementById("cloudStatus").className = "sync-badge sync-offline";
+                document.getElementById("cloudStatus").innerText = "❌ فشل الاتصال بالسحابة";
             }
         }
 
-        function importInvoiceFromExcel(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet);
-                
-                if(jsonData.length === 0) {
-                    showToast("ملف Excel فارغ!", "error");
-                    return;
+        function seedInitialUsersData() {
+            firebaseDb.collection("users").get().then(snap => {
+                if(snap.empty) {
+                    firebaseDb.collection("users").doc("Ehab").set({ username: "Ehab", displayName: "إيهاب", password: "123456", role: "admin" });
+                    firebaseDb.collection("users").doc("Keroles").set({ username: "Keroles", displayName: "كيرلس", password: "7890", role: "staff" });
                 }
-
-                activeInvoiceItems = jsonData.map(row => {
-                    return {
-                        name: row['اسم الصنف'] || row['الصنف'] || row['Item'] || 'صنف غير معروف',
-                        unit: row['الوحدة'] || row['Unit'] || 'قطعة',
-                        price: parseFloat(row['السعر'] || row['Price'] || 0),
-                        quantity: parseFloat(row['الكمية'] || row['Qty'] || row['Quantity'] || 1)
-                    };
-                });
-
-                renderInvoiceTable();
-                showToast(`تم استيراد ${activeInvoiceItems.length} صنف بنجاح للفاتورة`);
-                document.getElementById('invoiceExcelFileInput').value = '';
-            };
-            reader.readAsArrayBuffer(file);
+            });
         }
 
-        function exportInvoiceToExcel() {
-            if(activeInvoiceItems.length === 0) return showToast("لا توجد بيانات لتصديرها، الفاتورة فارغة!", "error");
-            
-            const excelRows = activeInvoiceItems.map(item => ({
-                'اسم الصنف': item.name,
-                'الوحدة': item.unit,
-                'السعر': item.price,
-                'الكمية المطلوبة': item.quantity,
-                'الإجمالي': item.price * item.quantity
-            }));
+        function handleMultiUserLogin(event) {
+            event.preventDefault();
+            const userInp = document.getElementById("loginUsername").value.trim();
+            const passInp = document.getElementById("loginPassword").value;
+            const errorDiv = document.getElementById("loginError");
 
-            const worksheet = XLSX.utils.json_to_sheet(excelRows);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "الفاتورة الحالية");
-            
-            const clientName = document.getElementById("invoiceClient").value.trim() || "فاتورة_غير_معنونة";
-            XLSX.writeFile(workbook, `فاتورة_${clientName}_${new Date().toLocaleDateString('ar-EG')}.xlsx`);
-            showToast("تم تحميل ملف الفاتورة بنجاح");
-        }
+            if(!firebaseDb) {
+                alert("السحابة غير متصلة بعد، انتظر ثانية أو تحقق من الإنترنت");
+                return;
+            }
 
-        function exportToExcel() {
-            if(allItemsCached.length === 0) return showToast("المخزن فارغ حالياً!", "error");
-            const worksheet = XLSX.utils.json_to_sheet(allItemsCached);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "المخزن السحابي");
-            XLSX.writeFile(workbook, `قاعدة_بيانات_المخزن_${new Date().toLocaleDateString('ar-EG')}.xlsx`);
-        }
-
-        function importFromExcel(event) {
-            if (currentUser.role !== 'admin') return showToast("عفواً، لا تمتلك صلاحية تعديل المخزن الأساسي", "error");
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet);
-                
-                let batch = firebaseDb.batch();
-                let count = 0;
-
-                jsonData.forEach(row => {
-                    const name = row['name'] || row['اسم الصنف'];
-                    if(name) {
-                        const docRef = firebaseDb.collection("products").doc(name.toString().trim());
-                        batch.set(docRef, {
-                            name: name.toString().trim(),
-                            category: row['category'] || row['التصنيف'] || 'عام',
-                            unit: row['unit'] || row['الوحدة'] || 'قطعة',
-                            price: parseFloat(row['price'] || row['السعر الحالي'] || row['السعر الأساسي'] || 0)
-                        });
-                        count++;
+            firebaseDb.collection("users").doc(userInp).get().then(doc => {
+                if(doc.exists && doc.data().password === passInp) {
+                    const userData = doc.data();
+                    currentUser = { username: userData.username, displayName: userData.displayName, role: userData.role };
+                    
+                    if(userData.role === 'admin') {
+                        document.body.classList.add('is-admin');
+                    } else {
+                        document.body.classList.remove('is-admin');
                     }
-                });
-
-                batch.commit().then(() => {
-                    showToast(`🚀 تم رفع وتحديث ${count} صنف بنجاح على السحابة!`);
-                    document.getElementById('excelFileInput').value = '';
-                }).catch(() => showToast("حدث خطأ أثناء الرفع الجماعي", "error"));
-            };
-            reader.readAsArrayBuffer(file);
+                    
+                    document.getElementById("userBadge").innerText = `👤 ${currentUser.displayName} (${currentUser.role === 'admin' ? 'مدير عام' : 'مستخدم'})`;
+                    document.getElementById("loginOverlay").style.opacity = 0;
+                    setTimeout(() => { document.getElementById("loginOverlay").style.display = "none"; }, 400);
+                    showToast(`مرحباً بك: ${currentUser.displayName}`);
+                    setupSearchEngine();
+                } else {
+                    errorDiv.style.display = "block";
+                }
+            }).catch(() => {
+                errorDiv.innerText = "حدث خطأ في الشبكة السحابية";
+                errorDiv.style.display = "block";
+            });
         }
 
+        // ================= [دالة إصلاح وتعديل الأصناف السحابية] =================
         function saveItemToDb(event) {
             event.preventDefault();
-            if (currentUser.role !== 'admin') return showToast("عفواً، لا تمتلك صلاحية تعديل المخزن", "error");
+            if (currentUser.role !== 'admin') return showToast("عفواً، لا تمتلك صلاحية تعديل الأصناف", "error");
 
             const name = document.getElementById("item_name").value.trim();
             const category = document.getElementById("item_category").value.trim() || "عام";
@@ -501,6 +482,7 @@
 
             const product = { name, category, unit, price };
 
+            // إذا كان هناك تعديل في السعر، يتم توثيقه في سجل المراقبة
             if (editOldName && editOldPrice !== price) {
                 firebaseDb.collection("price_history").add({
                     itemName: name,
@@ -511,14 +493,16 @@
                 });
             }
 
+            // إذا تغير اسم الصنف بالكامل، نقوم بحذف الاسم القديم لمنع تكراره
             if (editOldName && editOldName !== name) {
                 firebaseDb.collection("products").doc(editOldName).delete();
             }
 
+            // حفظ التعديلات الجديدة على السحابة فوراً
             firebaseDb.collection("products").doc(name).set(product).then(() => {
                 showToast("تم حفظ وتحديث الصنف بنجاح!");
                 resetItemForm();
-            });
+            }).catch(() => showToast("حدث خطأ أثناء حفظ التعديلات", "error"));
         }
 
         function loadPriceHistory() {
@@ -549,6 +533,82 @@
             });
         }
 
+        function loadSystemUsers() {
+            if (!firebaseDb) return;
+            firebaseDb.collection("users").onSnapshot(snapshot => {
+                systemUsersCached = [];
+                const tbody = document.getElementById("usersTableBody");
+                tbody.innerHTML = "";
+                
+                snapshot.forEach(doc => {
+                    const u = doc.data();
+                    systemUsersCached.push(u);
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td style="font-weight:600; font-family:monospace;">${u.username}</td>
+                        <td>${u.displayName}</td>
+                        <td style="font-family:monospace; color:var(--text-muted);">${u.password}</td>
+                        <td><span style="color:${u.role==='admin'?'var(--accent)':'var(--text-main)'}">${u.role==='admin'?'مدير عام (Admin)':'مستخدم عادي (Staff)'}</span></td>
+                        <td>
+                            <button class="btn" style="padding:4px 8px; font-size:12px; color:var(--accent);" onclick="editUserFields('${u.username}')">✏️ تعديل / كلمة المرور</button>
+                            <button class="btn" style="padding:4px 8px; font-size:12px; color:var(--danger); ${u.username==='Ehab'?'display:none':''}" onclick="deleteUserFromDb('${u.username}')">✕ حذف</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        function saveUserToDb(event) {
+            event.preventDefault();
+            if (currentUser.role !== 'admin') return showToast("عفواً، لا تمتلك صلاحية إدارة الحسابات", "error");
+
+            const username = document.getElementById("user_username").value.trim();
+            const displayName = document.getElementById("user_displayName").value.trim();
+            const password = document.getElementById("user_password").value.trim();
+            const role = document.getElementById("user_role").value;
+            const isEdit = document.getElementById("user_is_edit").value === "true";
+
+            firebaseDb.collection("users").doc(username).set({
+                username, displayName, password, role
+            }).then(() => {
+                showToast(isEdit ? "تم تحديث بيانات الحساب وكلمة المرور بنجاح!" : "تم إضافة المستخدم الجديد للسيستم سحابياً!");
+                resetUserForm();
+            }).catch(() => showToast("حدث خطأ أثناء حفظ بيانات المستخدم", "error"));
+        }
+
+        function editUserFields(username) {
+            const u = systemUsersCached.find(user => user.username === username);
+            if(!u) return;
+            
+            document.getElementById("user_username").value = u.username;
+            document.getElementById("user_username").disabled = true;
+            document.getElementById("user_displayName").value = u.displayName;
+            document.getElementById("user_password").value = u.password;
+            document.getElementById("user_role").value = u.role;
+            
+            document.getElementById("user_is_edit").value = "true";
+            document.getElementById("userFormActionTitle").innerText = "✏️ تعديل بيانات الحساب: " + u.username;
+            document.getElementById("btnCancelUserEdit").style.display = "inline-flex";
+        }
+
+        function deleteUserFromDb(username) {
+            if(username === "Ehab") return alert("لا يمكن حذف حساب الأدمن الرئيسي للمنظومة!");
+            if(confirm(`هل أنت متأكد من حذف صلاحية دخول المستخدم (${username}) نهائياً؟`)) {
+                firebaseDb.collection("users").doc(username).delete().then(() => {
+                    showToast("تم إقصاء وحذف المستخدم من قاعدة البيانات");
+                });
+            }
+        }
+
+        function resetUserForm() {
+            document.getElementById("userForm").reset();
+            document.getElementById("user_username").disabled = false;
+            document.getElementById("user_is_edit").value = "false";
+            document.getElementById("userFormActionTitle").innerText = "إضافة / تعديل مستخدم سحابي";
+            document.getElementById("btnCancelUserEdit").style.display = "none";
+        }
+
         function saveInvoiceToCloud() {
             if (activeInvoiceItems.length === 0) return showToast("الفاتورة فارغة، لا يمكن أرشفتها!", "error");
             const client = document.getElementById("invoiceClient").value.trim() || "عميل افتراضي / غير محدد";
@@ -560,7 +620,7 @@
                 client: client,
                 items: activeInvoiceItems,
                 totalAmount: total,
-                savedBy: currentUser.username, // حفظ اسم المستخدم الذي قام بالعملية
+                savedBy: currentUser.displayName,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 dateStr: new Date().toLocaleString('ar-EG')
             };
@@ -606,8 +666,6 @@
 
         function showInvoiceDetails(inv) {
             currentSelectedArchivedInvoice = inv;
-            
-            // تمييز العنصر المختار في القائمة اليسرى
             document.querySelectorAll('.archive-item').forEach(el => el.classList.remove('selected'));
             const selectedElement = document.getElementById(`arch-${inv.invoiceId}`);
             if(selectedElement) selectedElement.classList.add('selected');
@@ -639,13 +697,9 @@
             });
         }
 
-        // ================= التحسينات الجديدة: الحذف، التعديل والتصدير من الأرشيف =================
-        
-        // 1. تصدير الفاتورة المحددة من داخل الأرشيف
         function exportArchivedInvoiceToExcel() {
             if(!currentSelectedArchivedInvoice) return;
             const inv = currentSelectedArchivedInvoice;
-            
             const excelRows = inv.items.map(item => ({
                 'اسم الصنف': item.name,
                 'الوحدة': item.unit,
@@ -653,23 +707,18 @@
                 'الكمية': item.quantity,
                 'الإجمالي': item.price * item.quantity
             }));
-
             const worksheet = XLSX.utils.json_to_sheet(excelRows);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "تفاصيل الفاتورة");
-            
             XLSX.writeFile(workbook, `أرشيف_فاتورة_${inv.invoiceId}_${inv.client}.xlsx`);
             showToast("تم تصدير الفاتورة المؤرشفة بنجاح");
         }
 
-        // 2. استدعاء الفاتورة المؤرشفة إلى مساحة العمل الحالية للتعديل عليها
         function loadInvoiceToWorkspace() {
             if(!currentSelectedArchivedInvoice) return;
-            if(confirm("هل تريد استدعاء هذه الفاتورة إلى شاشة العمل؟ سيؤدي ذلك لاستبدال البيانات غير المحفوظة في الشاشة الحالية.")) {
+            if(confirm("هل تريد استدعاء هذه الفاتورة إلى شاشة العمل؟")) {
                 activeInvoiceItems = JSON.parse(JSON.stringify(currentSelectedArchivedInvoice.items));
                 document.getElementById("invoiceClient").value = currentSelectedArchivedInvoice.client;
-                
-                // الانتقال لتبويب التسعير
                 const pricingTabBtn = document.querySelector(".nav-tabs .tab-btn:first-child");
                 switchTab('pricing-tab', pricingTabBtn);
                 renderInvoiceTable();
@@ -677,33 +726,24 @@
             }
         }
 
-        // 3. حذف الفاتورة نهائياً من الأرشيف السحابي (Admin Only)
         function deleteInvoiceFromArchive() {
-            if (currentUser.role !== 'admin') return showToast("عفواً، لا تمتلك صلاحية حذف الفواتير المؤرشفة", "error");
+            if (currentUser.role !== 'admin') return showToast("عفواً، لا تمتلك صلاحية حذف الفواتير", "error");
             if (!currentSelectedArchivedInvoice) return;
-            
             const invId = currentSelectedArchivedInvoice.invoiceId;
-            if(confirm(`⚠️ تحذير: هل أنت متأكد تماماً من حذف الفاتورة رقم (${invId}) نهائياً من السحابة؟`)) {
+            if(confirm(`⚠️ تحذير: هل أنت متأكد من حذف الفاتورة رقم (${invId}) نهائياً؟`)) {
                 firebaseDb.collection("invoices").doc(invId).delete().then(() => {
-                    showToast(`تم حذف الفاتورة ${invId} بنجاح من الأرشيف`);
+                    showToast(`تم حذف الفاتورة ${invId} بنجاح`);
                     currentSelectedArchivedInvoice = null;
                     document.getElementById("archiveActions").style.display = "none";
-                    document.getElementById("archiveDetailTitle").innerText = "تفاصيل الفاتورة المحددة";
-                    document.getElementById("archiveItemsBody").innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted)">اختر فاتورة من القائمة اليمنى لعرض محتوياتها</td></tr>`;
-                    document.getElementById("archiveDetailMeta").innerHTML = `
-                        <div>رقم الفاتورة: -</div>
-                        <div>المورد/العميل: -</div>
-                        <div>بواسطة المستخدم: -</div>
-                        <div>التاريخ والوقت: -</div>
-                        <div style="color:var(--accent); font-weight:700;">الإجمالي الكلي: -</div>
-                    `;
-                    loadInvoicesArchive(); // إعادة تحميل القائمة بعد الحذف
+                    document.getElementById("archiveItemsBody").innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted)">اختر فاتورة من القائمة لعرض محتوياتها</td></tr>`;
+                    loadInvoicesArchive();
                 }).catch(() => showToast("حدث خطأ أثناء محاولة الحذف", "error"));
             }
         }
 
         function setupSearchEngine() {
             const searchInput = document.getElementById("searchInput");
+            if(!searchInput) return;
             searchInput.addEventListener("input", (e) => {
                 const query = cleanArabicText(e.target.value.trim());
                 if (!query) { closeSearch(); return; }
@@ -719,13 +759,12 @@
         function renderSearchResults(results) {
             const resultsContainer = document.getElementById("searchResults");
             resultsContainer.innerHTML = "";
-            activeGridRowIndex = -1;
             if (results.length === 0) {
                 resultsContainer.innerHTML = `<div class="search-row" style="color:var(--text-muted)">لا توجد نتائج مطابقة</div>`;
                 resultsContainer.classList.add("active");
                 return;
             }
-            results.forEach((item, index) => {
+            results.forEach((item) => {
                 const div = document.createElement("div");
                 div.className = "search-row";
                 div.innerHTML = `
@@ -745,11 +784,7 @@
 
         function addItemToWorkspace(item) {
             const existingItem = activeInvoiceItems.find(i => i.name === item.name);
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                activeInvoiceItems.push({ name: item.name, unit: item.unit, price: item.price, quantity: 1 });
-            }
+            if (existingItem) { existingItem.quantity += 1; } else { activeInvoiceItems.push({ name: item.name, unit: item.unit, price: item.price, quantity: 1 }); }
             renderInvoiceTable();
         }
 
@@ -841,28 +876,49 @@
             document.getElementById("btnCancelEdit").style.display = "inline-flex";
         }
 
-        function deleteItemFromDb(name) {
-            if (confirm(`حذف (${name})؟`)) firebaseDb.collection("products").doc(name).delete();
+        function deleteItemFromDb(name) { if (confirm(`حذف (${name})؟`)) firebaseDb.collection("products").doc(name).delete(); }
+        
+        function resetItemForm() { 
+            document.getElementById("itemForm").reset(); 
+            document.getElementById("edit_old_name").value = ""; 
+            document.getElementById("edit_old_price").value = ""; 
+            document.getElementById("formActionTitle").innerText = "إضافة صنف جديد لقاعدة البيانات"; 
+            document.getElementById("btnCancelEdit").style.display = "none"; 
+        }
+        
+        function importFromExcel(event) {
+            if (currentUser.role !== 'admin') return showToast("صلاحية مدير فقط", "error");
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                let batch = firebaseDb.batch(); let count = 0;
+                jsonData.forEach(row => {
+                    const name = row['name'] || row['اسم الصنف'];
+                    if(name) {
+                        const docRef = firebaseDb.collection("products").doc(name.toString().trim());
+                        batch.set(docRef, { name: name.toString().trim(), category: row['category'] || row['التصنيف'] || 'عام', unit: row['unit'] || row['الوحدة'] || 'قطعة', price: parseFloat(row['price'] || row['السعر الحالي'] || 0) });
+                        count++;
+                    }
+                });
+                batch.commit().then(() => { showToast(`🚀 تم تحديث ${count} صنف سحابياً!`); });
+            };
+            reader.readAsArrayBuffer(file);
         }
 
-        function resetItemForm() {
-            document.getElementById("itemForm").reset();
-            document.getElementById("edit_old_name").value = "";
-            document.getElementById("edit_old_price").value = "";
-            document.getElementById("formActionTitle").innerText = "إضافة صنف جديد لقاعدة البيانات";
-            document.getElementById("btnCancelEdit").style.display = "none";
+        function exportToExcel() { if(allItemsCached.length === 0) return; const worksheet = XLSX.utils.json_to_sheet(allItemsCached); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "المخزن"); XLSX.writeFile(workbook, `المخزن_${new Date().toLocaleDateString('ar-EG')}.xlsx`); }
+        
+        function showToast(msg, type = "success") { 
+            const container = document.getElementById("toastContainer"); 
+            const toast = document.createElement("div"); 
+            toast.className = "toast"; 
+            if(type === "error") toast.style.borderRightColor = "var(--danger)"; 
+            toast.innerText = msg; container.appendChild(toast); 
+            setTimeout(() => toast.remove(), 2500); 
         }
-
-        function showToast(msg, type = "success") {
-            const container = document.getElementById("toastContainer");
-            const toast = document.createElement("div");
-            toast.className = "toast";
-            if(type === "error") toast.style.borderRightColor = "var(--danger)";
-            toast.innerText = msg; container.appendChild(toast);
-            setTimeout(() => toast.remove(), 2500);
-        }
-
-        document.addEventListener("DOMContentLoaded", () => { setupSearchEngine(); });
     </script>
 </body>
 </html>
